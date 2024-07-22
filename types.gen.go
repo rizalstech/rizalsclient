@@ -516,9 +516,11 @@ type ContactServiceContactRequestInput struct {
 type RadminAppApp struct {
 	CreatedAt   time.Time `json:"createdAt"`
 	Description string    `json:"description"`
+	Email       string    `json:"email"`
 	Id          string    `json:"id"`
 	IsActive    bool      `json:"isActive"`
-	LogoUrl     string    `json:"logoUrl"`
+	LogoUrl     *string   `json:"logoUrl,omitempty"`
+	MainColor   string    `json:"mainColor"`
 	Name        string    `json:"name"`
 	UiUrl       string    `json:"uiUrl"`
 	UpdatedAt   time.Time `json:"updatedAt"`
@@ -527,9 +529,11 @@ type RadminAppApp struct {
 // RadminAppCreateAppInput defines model for RadminAppCreateAppInput.
 type RadminAppCreateAppInput struct {
 	Description string             `json:"description"`
+	Email       string             `json:"email"`
 	Id          string             `json:"id"`
 	IsActive    bool               `json:"isActive"`
 	Logo        openapi_types.File `json:"logo"`
+	MainColor   string             `json:"mainColor"`
 	Name        string             `json:"name"`
 	UiUrl       string             `json:"uiUrl"`
 }
@@ -537,9 +541,11 @@ type RadminAppCreateAppInput struct {
 // RadminAppUpdateAppInput defines model for RadminAppUpdateAppInput.
 type RadminAppUpdateAppInput struct {
 	Description *string             `json:"description,omitempty"`
+	Email       *string             `json:"email,omitempty"`
 	Id          *string             `json:"id,omitempty"`
 	IsActive    *bool               `json:"isActive,omitempty"`
 	Logo        *openapi_types.File `json:"logo,omitempty"`
+	MainColor   *string             `json:"mainColor,omitempty"`
 	Name        *string             `json:"name,omitempty"`
 	UiUrl       *string             `json:"uiUrl,omitempty"`
 }
@@ -712,11 +718,11 @@ type BarbershopsAppUpdateBusinessSettingsJSONRequestBody = BarbershopsAppBusines
 // BarbershopsAppCreateBusinessJSONRequestBody defines body for BarbershopsAppCreateBusiness for application/json ContentType.
 type BarbershopsAppCreateBusinessJSONRequestBody = BarbershopsAppCreateBusinessInput
 
-// RadminAppCreateAppJSONRequestBody defines body for RadminAppCreateApp for application/json ContentType.
-type RadminAppCreateAppJSONRequestBody = RadminAppCreateAppInput
+// RadminAppCreateAppMultipartRequestBody defines body for RadminAppCreateApp for multipart/form-data ContentType.
+type RadminAppCreateAppMultipartRequestBody = RadminAppCreateAppInput
 
-// RadminAppUpdateAppJSONRequestBody defines body for RadminAppUpdateApp for application/json ContentType.
-type RadminAppUpdateAppJSONRequestBody = RadminAppUpdateAppInput
+// RadminAppUpdateAppMultipartRequestBody defines body for RadminAppUpdateApp for multipart/form-data ContentType.
+type RadminAppUpdateAppMultipartRequestBody = RadminAppUpdateAppInput
 
 // AuthServiceUpdateCurrentUserMultipartRequestBody defines body for AuthServiceUpdateCurrentUser for multipart/form-data ContentType.
 type AuthServiceUpdateCurrentUserMultipartRequestBody = AuthServiceUpdateUserInput

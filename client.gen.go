@@ -259,8 +259,6 @@ type ClientInterface interface {
 	// RadminAppCreateAppWithBody request with any body
 	RadminAppCreateAppWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	RadminAppCreateApp(ctx context.Context, body RadminAppCreateAppJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// RadminAppDeleteApp request
 	RadminAppDeleteApp(ctx context.Context, appId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -269,8 +267,6 @@ type ClientInterface interface {
 
 	// RadminAppUpdateAppWithBody request with any body
 	RadminAppUpdateAppWithBody(ctx context.Context, appId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	RadminAppUpdateApp(ctx context.Context, appId string, body RadminAppUpdateAppJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AuthServiceGetAdminUsers request
 	AuthServiceGetAdminUsers(ctx context.Context, appId string, params *AuthServiceGetAdminUsersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1073,18 +1069,6 @@ func (c *Client) RadminAppCreateAppWithBody(ctx context.Context, contentType str
 	return c.Client.Do(req)
 }
 
-func (c *Client) RadminAppCreateApp(ctx context.Context, body RadminAppCreateAppJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRadminAppCreateAppRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) RadminAppDeleteApp(ctx context.Context, appId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRadminAppDeleteAppRequest(c.Server, appId)
 	if err != nil {
@@ -1111,18 +1095,6 @@ func (c *Client) RadminAppGetApp(ctx context.Context, appId string, reqEditors .
 
 func (c *Client) RadminAppUpdateAppWithBody(ctx context.Context, appId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRadminAppUpdateAppRequestWithBody(c.Server, appId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) RadminAppUpdateApp(ctx context.Context, appId string, body RadminAppUpdateAppJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRadminAppUpdateAppRequest(c.Server, appId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -3723,17 +3695,6 @@ func NewRadminAppGetAppsRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewRadminAppCreateAppRequest calls the generic RadminAppCreateApp builder with application/json body
-func NewRadminAppCreateAppRequest(server string, body RadminAppCreateAppJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewRadminAppCreateAppRequestWithBody(server, "application/json", bodyReader)
-}
-
 // NewRadminAppCreateAppRequestWithBody generates requests for RadminAppCreateApp with any type of body
 func NewRadminAppCreateAppRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
@@ -3829,17 +3790,6 @@ func NewRadminAppGetAppRequest(server string, appId string) (*http.Request, erro
 	}
 
 	return req, nil
-}
-
-// NewRadminAppUpdateAppRequest calls the generic RadminAppUpdateApp builder with application/json body
-func NewRadminAppUpdateAppRequest(server string, appId string, body RadminAppUpdateAppJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewRadminAppUpdateAppRequestWithBody(server, appId, "application/json", bodyReader)
 }
 
 // NewRadminAppUpdateAppRequestWithBody generates requests for RadminAppUpdateApp with any type of body
@@ -4857,8 +4807,6 @@ type ClientWithResponsesInterface interface {
 	// RadminAppCreateAppWithBodyWithResponse request with any body
 	RadminAppCreateAppWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RadminAppCreateAppResponse, error)
 
-	RadminAppCreateAppWithResponse(ctx context.Context, body RadminAppCreateAppJSONRequestBody, reqEditors ...RequestEditorFn) (*RadminAppCreateAppResponse, error)
-
 	// RadminAppDeleteAppWithResponse request
 	RadminAppDeleteAppWithResponse(ctx context.Context, appId string, reqEditors ...RequestEditorFn) (*RadminAppDeleteAppResponse, error)
 
@@ -4867,8 +4815,6 @@ type ClientWithResponsesInterface interface {
 
 	// RadminAppUpdateAppWithBodyWithResponse request with any body
 	RadminAppUpdateAppWithBodyWithResponse(ctx context.Context, appId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RadminAppUpdateAppResponse, error)
-
-	RadminAppUpdateAppWithResponse(ctx context.Context, appId string, body RadminAppUpdateAppJSONRequestBody, reqEditors ...RequestEditorFn) (*RadminAppUpdateAppResponse, error)
 
 	// AuthServiceGetAdminUsersWithResponse request
 	AuthServiceGetAdminUsersWithResponse(ctx context.Context, appId string, params *AuthServiceGetAdminUsersParams, reqEditors ...RequestEditorFn) (*AuthServiceGetAdminUsersResponse, error)
@@ -7310,14 +7256,6 @@ func (c *ClientWithResponses) RadminAppCreateAppWithBodyWithResponse(ctx context
 	return ParseRadminAppCreateAppResponse(rsp)
 }
 
-func (c *ClientWithResponses) RadminAppCreateAppWithResponse(ctx context.Context, body RadminAppCreateAppJSONRequestBody, reqEditors ...RequestEditorFn) (*RadminAppCreateAppResponse, error) {
-	rsp, err := c.RadminAppCreateApp(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseRadminAppCreateAppResponse(rsp)
-}
-
 // RadminAppDeleteAppWithResponse request returning *RadminAppDeleteAppResponse
 func (c *ClientWithResponses) RadminAppDeleteAppWithResponse(ctx context.Context, appId string, reqEditors ...RequestEditorFn) (*RadminAppDeleteAppResponse, error) {
 	rsp, err := c.RadminAppDeleteApp(ctx, appId, reqEditors...)
@@ -7339,14 +7277,6 @@ func (c *ClientWithResponses) RadminAppGetAppWithResponse(ctx context.Context, a
 // RadminAppUpdateAppWithBodyWithResponse request with arbitrary body returning *RadminAppUpdateAppResponse
 func (c *ClientWithResponses) RadminAppUpdateAppWithBodyWithResponse(ctx context.Context, appId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RadminAppUpdateAppResponse, error) {
 	rsp, err := c.RadminAppUpdateAppWithBody(ctx, appId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseRadminAppUpdateAppResponse(rsp)
-}
-
-func (c *ClientWithResponses) RadminAppUpdateAppWithResponse(ctx context.Context, appId string, body RadminAppUpdateAppJSONRequestBody, reqEditors ...RequestEditorFn) (*RadminAppUpdateAppResponse, error) {
-	rsp, err := c.RadminAppUpdateApp(ctx, appId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
