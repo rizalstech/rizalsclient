@@ -261,6 +261,9 @@ type ClientInterface interface {
 
 	RadminAppCreateApp(ctx context.Context, body RadminAppCreateAppJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RadminAppDeleteApp request
+	RadminAppDeleteApp(ctx context.Context, appId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RadminAppGetApp request
 	RadminAppGetApp(ctx context.Context, appId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -1072,6 +1075,18 @@ func (c *Client) RadminAppCreateAppWithBody(ctx context.Context, contentType str
 
 func (c *Client) RadminAppCreateApp(ctx context.Context, body RadminAppCreateAppJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRadminAppCreateAppRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RadminAppDeleteApp(ctx context.Context, appId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRadminAppDeleteAppRequest(c.Server, appId)
 	if err != nil {
 		return nil, err
 	}
@@ -3748,6 +3763,40 @@ func NewRadminAppCreateAppRequestWithBody(server string, contentType string, bod
 	return req, nil
 }
 
+// NewRadminAppDeleteAppRequest generates requests for RadminAppDeleteApp
+func NewRadminAppDeleteAppRequest(server string, appId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "appId", runtime.ParamLocationPath, appId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/radmin/v1/apps/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewRadminAppGetAppRequest generates requests for RadminAppGetApp
 func NewRadminAppGetAppRequest(server string, appId string) (*http.Request, error) {
 	var err error
@@ -4809,6 +4858,9 @@ type ClientWithResponsesInterface interface {
 	RadminAppCreateAppWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RadminAppCreateAppResponse, error)
 
 	RadminAppCreateAppWithResponse(ctx context.Context, body RadminAppCreateAppJSONRequestBody, reqEditors ...RequestEditorFn) (*RadminAppCreateAppResponse, error)
+
+	// RadminAppDeleteAppWithResponse request
+	RadminAppDeleteAppWithResponse(ctx context.Context, appId string, reqEditors ...RequestEditorFn) (*RadminAppDeleteAppResponse, error)
 
 	// RadminAppGetAppWithResponse request
 	RadminAppGetAppWithResponse(ctx context.Context, appId string, reqEditors ...RequestEditorFn) (*RadminAppGetAppResponse, error)
@@ -6156,6 +6208,33 @@ func (r RadminAppCreateAppResponse) StatusCode() int {
 	return 0
 }
 
+type RadminAppDeleteAppResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *map[string]interface{}
+	JSON400      *ApiError
+	JSON401      *ApiError
+	JSON403      *ApiError
+	JSON404      *ApiError
+	JSON500      *ApiError
+}
+
+// Status returns HTTPResponse.Status
+func (r RadminAppDeleteAppResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RadminAppDeleteAppResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type RadminAppGetAppResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -7237,6 +7316,15 @@ func (c *ClientWithResponses) RadminAppCreateAppWithResponse(ctx context.Context
 		return nil, err
 	}
 	return ParseRadminAppCreateAppResponse(rsp)
+}
+
+// RadminAppDeleteAppWithResponse request returning *RadminAppDeleteAppResponse
+func (c *ClientWithResponses) RadminAppDeleteAppWithResponse(ctx context.Context, appId string, reqEditors ...RequestEditorFn) (*RadminAppDeleteAppResponse, error) {
+	rsp, err := c.RadminAppDeleteApp(ctx, appId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRadminAppDeleteAppResponse(rsp)
 }
 
 // RadminAppGetAppWithResponse request returning *RadminAppGetAppResponse
@@ -10305,6 +10393,67 @@ func ParseRadminAppCreateAppResponse(rsp *http.Response) (*RadminAppCreateAppRes
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest RadminAppApp
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ApiError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ApiError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest ApiError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ApiError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ApiError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRadminAppDeleteAppResponse parses an HTTP response from a RadminAppDeleteAppWithResponse call
+func ParseRadminAppDeleteAppResponse(rsp *http.Response) (*RadminAppDeleteAppResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RadminAppDeleteAppResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]interface{}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
